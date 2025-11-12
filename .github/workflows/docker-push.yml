@@ -19,7 +19,7 @@ jobs:
       matrix:
         include:
           - name: gateway
-            context: ./gateway
+            context: ./nginx
             docker_repo: sojucr7/gateway
           - name: client
             context: ./client
