@@ -52,7 +52,7 @@ jobs:
 
       - name: Run npm test in dev image (frontend only)
         if: ${{ matrix.name == 'client' }}
-        run: docker run --rm test-${{ matrix.name }}:latest npm test
+        run: docker run --rm -e CI=true test-${{ matrix.name }}:latest npm test -- --watchAll=false
 
       - name: Build & push image (${{ matrix.name }})
         uses: docker/build-push-action@v5
