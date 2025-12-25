@@ -30,6 +30,6 @@ services:
   nginx:
     image: sojucr7/gateway
     mem_limit: 128m
-    hostname: nginx
+    hostname: gateway
     ports:
       - "80:80"
