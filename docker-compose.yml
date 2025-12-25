@@ -1,39 +1,35 @@
+version: "3"
+
 services:
-  postgres:
-    image: "postgres:latest"
+  client:
+    image: sojucr7/client
+    mem_limit: 128m
+    hostname: client
+
+  server:
+    image: sojucr7/api
+    mem_limit: 128m
+    hostname: api
     environment:
-      - POSTGRES_PASSWORD=postgres_password
-  gateway:
-    build: ./nginx
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - PGUSER=${PGUSER}
+      - PGHOST=${PGHOST}
+      - PGDATABASE=${PGDATABASE}
+      - PGPASSWORD=${PGPASSWORD}
+      - PGPORT=${PGPORT}
+
+  worker:
+    image: sojucr7/worker
+    mem_limit: 128m
+    hostname: worker
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+
+  nginx:
+    image: sojucr7/gateway
+    mem_limit: 128m
+    hostname: nginx
     ports:
       - "80:80"
-    depends_on:
-      - client
-      - api
-  client:
-    build: ./client
-    ports:
-      - 7777:7777
-  api:
-    build: ./server
-    ports:
-      - 5000:5000
-    environment:
-      PGDATABASE: postgres
-      PGUSER: postgres
-      PGPASSWORD: postgres_password
-      PGHOST: postgres
-      PGPORT: 5432
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-  redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"
-  worker:
-    build: ./worker
-    environment:
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-volumes:
-  db_data:
