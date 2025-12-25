@@ -74,6 +74,5 @@ jobs:
           region: us-east-1
           application_name: multi-docker
           environment_name: Multi-docker-env
-          version_label: ${{ github.sha }}
           bucket_name: elasticbeanstalk-us-east-1-418295702108
           bucket_path: docker-multi
