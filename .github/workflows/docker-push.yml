@@ -65,3 +65,15 @@ jobs:
             ${{ matrix.docker_repo }}:${{ github.sha }}
           # Uncomment to build for multiple platforms:
           # platforms: linux/amd64,linux/arm64
+
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          region: us-east-1
+          application_name: multi-docker
+          environment_name: Multi-docker-env
+          version_label: ${{ github.sha }}
+          bucket_name: elasticbeanstalk-us-east-1-418295702108
+          bucket_path: docker-multi
