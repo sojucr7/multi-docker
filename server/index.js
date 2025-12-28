@@ -28,14 +28,26 @@ pgClient.on('connect', (client) => {
     .catch((err) => console.error(err));
 });
 
-// Redis Client Setup
-const redis = require('redis');
-const redisClient = redis.createClient({
-  host: keys.redisHost,
-  port: keys.redisPort,
-  retry_strategy: () => 1000,
+const { createClient } = require('redis');
+
+const redisClient = createClient({
+  socket: {
+    host: keys.redisHost,
+    port: keys.redisPort,
+    reconnectStrategy: () => 1000,
+  }
 });
+
+redisClient.on('error', (err) => {
+  console.error('Redis Client Error', err);
+});
+
 const redisPublisher = redisClient.duplicate();
+
+(async () => {
+  await redisClient.connect();
+  await redisPublisher.connect();
+})();
 
 // Express route handlers
 
@@ -51,8 +63,7 @@ app.get('/values/all', async (req, res) => {
 
 app.get('/values/current', async (req, res) => {
   try{
-    await redisClient.connect();
-   const values = await redisClient.hgetall('values');
+   const values = await redisClient.hGetAll('values');
    res.send(values);
   }
   catch(e){
