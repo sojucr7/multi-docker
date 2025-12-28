@@ -16,10 +16,7 @@ const pgClient = new Pool({
   host: keys.pgHost,
   database: keys.pgDatabase,
   password: keys.pgPassword,
-  port: keys.pgPort,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  port: keys.pgPort
 });
 
 pgClient.on('connect', (client) => {
@@ -57,8 +54,12 @@ app.get('/values/all', async (req, res) => {
 });
 
 app.get('/values/current', async (req, res) => {
-  await ensureRedisReady(redisClient);
-  redisClient.hgetall('values', (err, values) => {
+
+  redis.createClient({
+  host: keys.redisHost,
+  port: keys.redisPort,
+  retry_strategy: () => 1000,
+}).hgetall('values', (err, values) => {
     res.send(values);
   });
 });
