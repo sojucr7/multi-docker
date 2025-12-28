@@ -51,8 +51,9 @@ app.get('/values/all', async (req, res) => {
 app.get('/values/current', async (req, res) => {
 
   await client.connect(); // You must call this in v4+
-  const values = await client.hGetAll('values');
-  res.send(values);
+  await client.hgetall('values', (err, values) => {
+    res.send(values);
+  })
 });
 
 app.post('/values', async (req, res) => {
