@@ -30,25 +30,17 @@ pgClient.on('connect', (client) => {
 
 // Redis Client Setup
 const redis = require('redis');
-const redisClient = redis.createClient({
-  host: keys.redisHost,
-  port: keys.redisPort,
-  retry_strategy: () => 1000,
+const redisClient = createClient({
+    url: `redis://${keys.redisHost}:${keys.redisPort}`
 });
 const redisPublisher = redisClient.duplicate();
-
+redisClient.on('error', err => console.log('Redis Client Error', err));
 // Express route handlers
 
 app.get('/', (req, res) => {
   res.send('Hi');
 });
 
-async function ensureRedisReady(client) {
-  if (!client.isReady) {
-    console.log('not ready')
-    await client.connect();
-  }
-}
 
 app.get('/values/all', async (req, res) => {
   const values = await pgClient.query('SELECT * from values');
@@ -58,13 +50,9 @@ app.get('/values/all', async (req, res) => {
 
 app.get('/values/current', async (req, res) => {
 
-  redis.createClient({
-  host: keys.redisHost,
-  port: keys.redisPort,
-  retry_strategy: () => 1000,
-}).hgetall('values', (err, values) => {
-    res.send(values);
-  });
+  await client.connect(); // You must call this in v4+
+  const values = await client.hGetAll('values');
+  res.send(values);
 });
 
 app.post('/values', async (req, res) => {
