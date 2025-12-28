@@ -51,8 +51,9 @@ app.get('/values/all', async (req, res) => {
 
 app.get('/values/current', async (req, res) => {
   try {
-    const values = await redisClient.hgetall('values');
+  redisClient.hgetall('values', (err, values) => {
     res.send(values);
+  });
   } catch (err) {
     console.error('Redis error:', err);
     res.status(500).send('Redis error');
