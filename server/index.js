@@ -50,15 +50,16 @@ app.get('/values/all', async (req, res) => {
 
 app.get('/values/current', async (req, res) => {
 
-  await client.connect(); // You must call this in v4+
-  await client.hgetall('values', (err, values) => {
+  await redisClient.connect(); // You must call this in v4+
+  await redisClient.hgetall('values', (err, values) => {
     res.send(values);
   })
 });
 
 app.post('/values', async (req, res) => {
   const index = req.body.index;
-
+  await redisClient.connect()
+  await redisPublisher.connect()
   if (parseInt(index) > 40) {
     return res.status(422).send('Index too high');
   }
