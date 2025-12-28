@@ -30,7 +30,7 @@ pgClient.on('connect', (client) => {
 
 // Redis Client Setup
 const redis = require('redis');
-const redisClient = createClient({
+const redisClient = redis.createClient({
     url: `redis://${keys.redisHost}:${keys.redisPort}`
 });
 const redisPublisher = redisClient.duplicate();
