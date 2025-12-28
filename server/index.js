@@ -50,7 +50,6 @@ app.get('/values/all', async (req, res) => {
 
 app.get('/values/current', async (req, res) => {
 
-  console.log(redisClient.get('test'))
   redisClient.hgetall('values', (err, values) => {
     res.send(values);
   })
@@ -61,7 +60,6 @@ app.post('/values', async (req, res) => {
   if (parseInt(index) > 40) {
     return res.status(422).send('Index too high');
   }
-  redisClient.set('test', 'hello');
   redisClient.hset('values', index, 'Nothing yet!');
   redisPublisher.publish('insert', index);
   pgClient.query('INSERT INTO values(number) VALUES($1)', [index]);
@@ -69,6 +67,12 @@ app.post('/values', async (req, res) => {
   res.send({ working: true });
 });
 
-app.listen(5000, (err) => {
-  console.log('Listening');
-});
+
+redisClient.on('ready', () => {
+  console.log('✅ Redis is ready. Starting server...');
+  
+  // 2. Start the Express server only AFTER Redis is up
+  app.listen(5000, () => {
+    console.log('🚀 Server listening on port 5000');
+  });
+})
